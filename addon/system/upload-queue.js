@@ -137,7 +137,8 @@ export default Ember.ArrayProxy.extend({
     for (let i = 0, len = files.length; i < len; i++) {
       var file = File.create({
         uploader: uploader,
-        file: files[i]
+        file: files[i],
+        queue: this
       });
 
       this.pushObject(file);
@@ -276,7 +277,9 @@ export default Ember.ArrayProxy.extend({
           Ember.run.debounce(uploader, 'refresh', 750);
           return Ember.RSVP.reject(error, `File: '${error.file.id}' ${error.message}`);
         };
-        file.isDestroyed = true;
+        if (file) {
+          file.destroy();
+        }
 
         get(this, 'target').sendAction('onfileadd', file, {
           name: get(this, 'name'),

@@ -130,9 +130,8 @@ export default Ember.Object.extend({
     @method destroy
    */
   destroy() {
-    if (this.isDestroyed) { return; }
+    this._super(...arguments);
     get(this, 'uploader').removeFile(get(this, 'file'));
-    this.isDestroyed = true;
   },
 
   upload(url, settings) {
@@ -159,7 +158,9 @@ export default Ember.Object.extend({
       if (this.file.status === plupload.FAILED) {
         this.file.status = plupload.QUEUED;
       }
-      uploader.start();
+      if (this.get('queue').every((f) => f.settings)) {
+        uploader.start();
+      }
     }
 
     return this._deferred.promise;
